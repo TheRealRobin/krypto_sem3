@@ -21,6 +21,7 @@ def unslice_text(plainslices: list,encoding: str) -> str:
     plaintxt = encoded_bytes.decode(encoding,"ignore")
     return plaintxt
 
+# Die gesamte Funktionsweise des MiniDES-Algorithmus basiert auf der Vorlesung von Prof. Matthes
 def __expand_input(inp: BitArray) -> BitArray(length=6):
     inp_4 = BitArray(length=4)
     if len(inp) <= 4:
@@ -87,14 +88,10 @@ def __s_box(xorin: BitArray) -> BitArray:
     return d1234
 
 def __mini_des_step(round_input: BitArray(length=4), round_key: BitArray(length=6)) -> BitArray(length=4):
-    # expand input from 4 to 6 bits
-    expin = __expand_input(round_input)
-    # XOR with key
-    xorin = __xor(expin, round_key)
-    # Feed into S-Boxes (6bit -> 4bit)
-    sboxd = __s_box(xorin)
-    # return the cyphertext for this round
-    return sboxd
+    expin = __expand_input(round_input)     # expand input (4bit -> 6bit)
+    xorin = __xor(expin, round_key)         # XOR with key (6bit -> 6bit)
+    sboxd = __s_box(xorin)                  # Feed into S-Boxes (6bit -> 4bit)
+    return sboxd                            # return the cyphertext for this step
 
 def encrypt_block(lr: BitArray, key: BitArray) -> BitArray:
     l0 = lr[0:4]
@@ -115,7 +112,7 @@ def decrypt_block(lr: BitArray, key: BitArray) -> BitArray:
     r2 = lr[4:8]
     k1 = key[6:12]
     r1 = l2
-    l1 = __xor(__mini_des_step(r1,k1),r2) #TEST mmaybe wrong
+    l1 = __xor(__mini_des_step(r1,k1),r2)
     k0 = key[0:6]
     r0 = l1
     l0 = __xor(__mini_des_step(r0,k0),r1)
